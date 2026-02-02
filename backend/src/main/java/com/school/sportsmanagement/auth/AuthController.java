@@ -43,10 +43,21 @@ public class AuthController {
 
   @PostMapping("/users")
   public ApiResponse<AuthDtos.UserProfile> createUser(@Valid @RequestBody AuthDtos.CreateUserRequest request) {
-    List<Role> roles = request.roles() == null ? List.of() : request.roles().stream()
-      .map(roleName -> roleRepository.findByName(roleName)
-        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName)))
-      .collect(Collectors.toList());
+    List<Role> roles = resolveRoles(request.roles());
+    AuthUser user = authService.createUser(request, roles);
+    return ApiResponse.ok(new AuthDtos.UserProfile(
+      user.getId().toString(),
+      user.getEmail(),
+      user.getRoles().stream().map(Role::getName).toList()
+    ));
+  }
+
+  @PostMapping("/register")
+  public ApiResponse<AuthDtos.UserProfile> register(@Valid @RequestBody AuthDtos.CreateUserRequest request) {
+    List<String> roleNames = request.roles() == null || request.roles().isEmpty()
+      ? List.of("STUDENT")
+      : request.roles();
+    List<Role> roles = resolveRoles(roleNames);
     AuthUser user = authService.createUser(request, roles);
     return ApiResponse.ok(new AuthDtos.UserProfile(
       user.getId().toString(),
@@ -65,5 +76,12 @@ public class AuthController {
       user.getEmail(),
       user.getRoles().stream().map(Role::getName).toList()
     ));
+  }
+
+  private List<Role> resolveRoles(List<String> roleNames) {
+    return roleNames == null ? List.of() : roleNames.stream()
+      .map(roleName -> roleRepository.findByName(roleName)
+        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName)))
+      .collect(Collectors.toList());
   }
 }

@@ -29,7 +29,13 @@ public class SecurityConfig {
       .csrf(csrf -> csrf.disable())
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/swagger-ui/**", "/api-docs/**").permitAll()
+        .requestMatchers(
+          "/api/v1/auth/login",
+          "/api/v1/auth/refresh",
+          "/api/v1/auth/register",
+          "/swagger-ui/**",
+          "/api-docs/**"
+        ).permitAll()
         .requestMatchers(HttpMethod.POST, "/api/v1/auth/users").hasRole("ADMIN")
         .anyRequest().authenticated()
       )
