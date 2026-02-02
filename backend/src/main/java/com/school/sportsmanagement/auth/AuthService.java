@@ -57,6 +57,10 @@ public class AuthService {
   }
 
   public AuthUser createUser(AuthDtos.CreateUserRequest request, List<Role> roles) {
+    userRepository.findByEmail(request.email())
+      .ifPresent(existing -> {
+        throw new IllegalArgumentException("Email already registered");
+      });
     AuthUser user = new AuthUser();
     user.setId(UUID.randomUUID());
     user.setEmail(request.email());

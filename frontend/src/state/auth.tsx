@@ -11,6 +11,7 @@ interface AuthContextValue {
   user: UserProfile | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -32,6 +33,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('auth:user', JSON.stringify(me.data.data));
   };
 
+  const register = async (email: string, password: string, role: string) => {
+    await apiClient.post('/auth/register', {
+      email,
+      password,
+      roles: [role],
+    });
+    await login(email, password);
+  };
+
   const logout = () => {
     const refreshToken = localStorage.getItem('auth:refresh');
     if (refreshToken) {
@@ -44,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const value = useMemo(
-    () => ({ user, isAuthenticated: Boolean(user), login, logout }),
+    () => ({ user, isAuthenticated: Boolean(user), login, register, logout }),
     [user]
   );
 
