@@ -1,15 +1,4 @@
-# Backend
-backend/target/
-backend/.idea/
-
-# Frontend
-frontend/node_modules/
-frontend/dist/
-
-# IDE
-.vscode/
-.idea/
-
-# OS
+/backend/target/
+/frontend/node_modules/
+/frontend/dist/
 .DS_Store
-Thumbs.db
